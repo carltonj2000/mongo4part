@@ -1,0 +1,30 @@
+use('sample_airbnb');
+
+db.listingsAndReviews.aggregate([
+  {
+    $match: { 
+      bedrooms: 1,
+      "address.country": "Australia",
+      "address.market": "Sydney",
+      "address.suburb": { $exists: 1, $ne: "" },
+      room_type: "Entire home/apt"
+    }
+  }, 
+  {
+    $group: {
+      _id: "$address.suburb",
+      averagePrice: {
+        "$avg": "$price"
+      }
+    }
+  },
+  {
+    $sort: {
+      "averagePrice": 1
+    }
+  }, 
+  {
+    $limit: 10
+  }
+]);
+
